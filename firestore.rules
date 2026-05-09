@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidInstitution(data) {
+      return data.name is string && data.name.size() <= 200 &&
+             data.type in ['hospital', 'clinic', 'nursing_home', 'academy'] &&
+             data.lat is number && data.lon is number;
+    }
+
+    function isValidLead(data) {
+      return data.userId == request.auth.uid &&
+             data.institutionId is string &&
+             data.status in ['discovered', 'applied', 'interview', 'accepted', 'rejected'] &&
+             data.keys().hasAll(['userId', 'institutionId', 'status', 'savedAt']);
+    }
+
+    // Institutions Collection (Public read, Admin or System write)
+    match /institutions/{instId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidInstitution(request.resource.data);
+      allow update: if isSignedIn() && isValidInstitution(request.resource.data);
+    }
+
+    // User Leads (Private per user)
+    match /users/{userId}/leads/{leadId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidLead(request.resource.data);
+      allow update: if isOwner(userId) && isValidLead(request.resource.data);
+      allow delete: if isOwner(userId);
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "CareScout Germany",
+  "description": "An elite AI-powered healthcare intelligence platform for discovering Pflege Ausbildung opportunities and recruiter contacts across Germany.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "AI Discovery",
+    "OSM Mapping",
+    "Contact Extraction"
+  ]
+}

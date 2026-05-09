@@ -1,0 +1,50 @@
+{
+  "entities": {
+    "Institution": {
+      "title": "Healthcare Institution",
+      "description": "A hospital, clinic, or nursing home discovered in Germany.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["hospital", "clinic", "nursing_home", "academy"] },
+        "city": { "type": "string" },
+        "lat": { "type": "number" },
+        "lon": { "type": "number" },
+        "website": { "type": "string" },
+        "intel": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "integer" },
+            "visaSupport": { "type": "boolean" },
+            "accommodation": { "type": "boolean" },
+            "languageReq": { "type": "string" }
+          }
+        }
+      },
+      "required": ["name", "type", "lat", "lon"]
+    },
+    "Lead": {
+      "title": "Saved Lead",
+      "description": "An opportunity saved by the user for tracking.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "institutionId": { "type": "string" },
+        "status": { "type": "string", "enum": ["discovered", "applied", "interview", "accepted", "rejected"] },
+        "savedAt": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string" }
+      },
+      "required": ["userId", "institutionId", "status"]
+    }
+  },
+  "firestore": {
+    "institutions": {
+      "schema": "Institution",
+      "description": "Global directory of discovered German healthcare institutions."
+    },
+    "users/{userId}/leads": {
+      "schema": "Lead",
+      "description": "Personal leads tracked by an individual user."
+    }
+  }
+}
