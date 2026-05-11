@@ -1,57 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-brand-cyan: #00f2ff;
-  --color-brand-navy: #0a192f;
-  --color-glass-white: rgba(255, 255, 255, 0.08);
-  --color-glass-border: rgba(255, 255, 255, 0.12);
+  --font-sans: "Outfit", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --color-neon-cyan: #00f2ff;
+  --color-neon-purple: #bc13fe;
+  --color-neon-pink: #ff00ff;
+  --color-neon-green: #39ff14;
 }
 
 @layer base {
   body {
-    @apply bg-[#030712] text-slate-200 antialiased selection:bg-cyan-500/30 overflow-x-hidden;
+    @apply bg-[#000000] text-slate-100 antialiased selection:bg-neon-cyan/30 overflow-x-hidden;
     background-image: 
-      radial-gradient(at 0% 0%, rgba(0, 242, 255, 0.05) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.05) 0px, transparent 50%);
+      radial-gradient(circle at 0% 0%, rgba(0, 242, 255, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(188, 19, 254, 0.08) 0%, transparent 50%),
+      linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
   }
 
-  .glass-card {
-    @apply bg-white/5 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)];
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%);
+  .scanline {
+    width: 100%;
+    height: 100px;
+    z-index: 100;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(0, 242, 255, 0.04) 50%, rgba(0, 0, 0, 0) 100%);
+    opacity: 0.2;
+    position: absolute;
+    bottom: 100%;
+    animation: scanline 10s linear infinite;
+    pointer-events: none;
   }
 
-  .glass-nav {
-    @apply bg-black/20 backdrop-blur-3xl border-r border-white/5;
+  @keyframes scanline {
+    0% { bottom: 100%; }
+    100% { bottom: -100px; }
   }
 
-  .text-glow {
-    text-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-white to-cyan-200;
+  .neon-border {
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+    transition: all 0.3s ease;
   }
 
-  .marker-pulse {
-    @apply relative flex items-center justify-center pointer-events-auto;
+  .neon-border:hover {
+    border-color: var(--color-neon-cyan);
+    box-shadow: 0 0 25px rgba(0, 242, 255, 0.3);
   }
-}
 
-@keyframes liquid {
-  0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-  50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
-  100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-}
+  .neon-border-purple {
+    border-color: rgba(188, 19, 254, 0.2);
+    box-shadow: 0 0 15px rgba(188, 19, 254, 0.1);
+  }
 
-.liquid-bg {
-  animation: liquid 8s ease-in-out infinite;
-}
+  .neon-border-purple:hover {
+    border-color: var(--color-neon-purple);
+    box-shadow: 0 0 25px rgba(188, 19, 254, 0.3);
+  }
 
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
-}
+  .apple-glass {
+    @apply bg-black/60 backdrop-blur-[40px] border border-white/10;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+  .neon-glow-cyan {
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.3), inset 0 0 10px rgba(0, 242, 255, 0.1);
+  }
+
+  .neon-glow-purple {
+    box-shadow: 0 0 20px rgba(188, 19, 254, 0.3), inset 0 0 10px rgba(188, 19, 254, 0.1);
+  }
+
+  .ios-transition {
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .premium-gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-white/40;
+  }
 }

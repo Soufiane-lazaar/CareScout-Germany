@@ -9,24 +9,18 @@ export async function deepResearchInstitution(inst: Institution): Promise<Partia
     Identity: Senior Web Scraping Engineer & Germany Healthcare Recruiter.
     Target: ${inst.name} in ${inst.city}, Germany (Domain: ${inst.website || 'Search for official portal'})
     
-    Task: Conduct a recursive deep-research crawl on this institution to discover its OFFICIAL WEBSITE URL and ALL types of Pflege Ausbildung opportunities, specifically focusing on international recruitment pipelines.
+    Task: Conduct a recursive deep-research mission. Use GOOGLE SEARCH and internal databases to discover its "Anwerbevertrag Pflege" participation and international recruitment robustness.
     
     Research Protocol:
-    1. LOCATE official .de domain and specific "Karriere" or "Interational" sub-portals.
-    2. CRAWL internal links focusing on:
-       - Generalisierte Pflegeausbildung
-       - International Nursing Programs ("Internationale Pflegekräfte", "Anerkennung")
-       - Specific recruitment partnerships (e.g., Triple Win, agreements with Morocco/Mexico/Vietnam).
-    3. DETECT "International Contract" signals:
-       - Relocation support (Finding an apartment).
-       - Visa sponsorship handling.
-       - Language course funding (B2 level).
-       - Specific mentions of Morocco (Marokko) or recruitment agencies.
-    4. EXTRACT:
-       - The direct official website URL (NOT a search engine).
-       - Direct recruiters for international candidates.
-       - Presence of an in-house Pflegeschule (Nursing School).
-    5. ANALYSIS: Is this hospital a "High-Probability Match" for a Moroccan candidate? (Evaluate based on existing international clusters).
+    1. SEARCH & VERIFY: Use Google Search to find official government and GIZ/ZAV partner lists to confirm if this institution is part of the "Anwerbevertrag Pflege Deutschland International" network.
+    2. HR DISCOVERY: Specifically find the contact details of the "Pflegedirektion" (Nursing Director) or "Personalabteilung" (HR) including direct TELEPHONE numbers and official Email addresses for recruitment staff.
+    3. DISCOURSE ANALYSIS: Scan Reddit (r/nursing, r/germany), LinkedIn, and local German healthcare forums to find real-world feedback on their international integration quality.
+    4. TARGET Specific Agreements: Look for "Gütezeichen Fachkräftegewinnung" (fair recruitment seal) or "Triple Win" status.
+    5. DETECT High-Value Signals:
+       - Direct visa sponsorship (Fachkräfteeinwanderungsgesetz).
+       - Presence of dedicated "Integration Managers" for internationals.
+       - Support for professional recognition (Anerkennungsverfahren).
+    6. ANALYSIS: Is this institution a verified "Anwerbevertrag" partner? Provide evidence-based assessment.
     
     Return a strictly structured JSON object. If data is hidden, provide a high-probability tactical estimate based on current German hospital recruitment trends.`;
 
@@ -46,7 +40,8 @@ export async function deepResearchInstitution(inst: Institution): Promise<Partia
                 properties: {
                   name: { type: Type.STRING },
                   email: { type: Type.STRING },
-                  role: { type: Type.STRING }
+                  phone: { type: Type.STRING, description: "Direct office number with extension" },
+                  role: { type: Type.STRING, description: "Job title e.g., Head of Nursing Recruitment" }
                 }
               }
             },

@@ -7,6 +7,7 @@ export interface Institution {
   city: string;
   address?: string;
   website?: string;
+  phone?: string;
   intel?: {
     contacts: Contact[];
     score: number;
@@ -28,6 +29,7 @@ export interface Institution {
 export interface Contact {
   name: string;
   email: string;
+  phone?: string;
   role: string;
 }
 

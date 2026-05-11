@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Mail, Lock, LogIn, UserPlus, Building2, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, LogIn, UserPlus, Globe, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface AuthProps {
@@ -57,58 +57,59 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center relative bg-[#030712] overflow-hidden px-4">
+    <div className="min-h-screen w-full flex items-center justify-center relative bg-[#000000] overflow-hidden px-4">
       {/* Decorative background elements */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] animate-pulse"></div>
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-neon-cyan/10 rounded-full blur-[150px] animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-neon-purple/10 rounded-full blur-[150px] animate-pulse"></div>
       </div>
+      
+      <div className="scanline opacity-20" />
 
       <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        className="w-full max-w-md z-10"
+        initial={{ opacity: 0, scale: 0.9, filter: 'blur(20px)' }}
+        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-lg z-10"
       >
-        <div className="glass-card p-10 border-white/10 relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50"></div>
+        <div className="apple-glass p-8 sm:p-16 rounded-[32px] sm:rounded-[48px] neon-border relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50 shadow-[0_0_20px_rgba(0,242,255,1)]"></div>
           
-          <div className="flex flex-col items-center mb-8 text-center">
-            <div className="w-16 h-16 bg-cyan-500 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(0,242,255,0.3)] group-hover:scale-110 transition-transform duration-500">
-              <Building2 className="text-white w-8 h-8" />
+          <div className="flex flex-col items-center mb-10 sm:mb-14 text-center">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-[22px] sm:rounded-[28px] flex items-center justify-center mb-6 sm:mb-8 shadow-[0_0_60px_rgba(0,242,255,0.4)] group-hover:scale-105 sm:group-hover:scale-110 transition-all duration-700 neon-border">
+              <Globe className="text-white w-7 h-7 sm:w-10 sm:h-10 neon-text-cyan shadow-[0_0_10px_rgba(0,242,255,1)]" />
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-glow mb-2">CareScout</h1>
-            <p className="text-slate-400 text-sm">{isLogin ? 'Welcome back to the discovery platform' : 'Join the elite healthcare intelligence network'}</p>
-            <div className="mt-4 p-2 bg-green-500/10 border border-green-500/20 rounded text-[10px] text-green-400 font-bold uppercase tracking-widest flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-              Discovery Network Active
-            </div>
+            <h1 className="text-4xl sm:text-6xl font-black tracking-tighter text-white uppercase italic leading-none">CareScout</h1>
+            <p className="text-neon-cyan text-[9px] sm:text-[11px] uppercase tracking-[0.4em] sm:tracking-[0.6em] font-black mt-4 sm:mt-6 opacity-60 neon-text-cyan">
+              {isLogin ? 'SYSTEM_INITIALIZATION_ALPHA' : 'NETWORK_PROVISIONING_SEQ'}
+            </p>
           </div>
 
-          <form onSubmit={handleAuth} className="space-y-5">
-            <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-slate-500 font-bold ml-1">Email Address</label>
-              <div className="relative group">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+          <form onSubmit={handleAuth} className="space-y-6 sm:space-y-8">
+            <div className="space-y-3 sm:space-y-4">
+              <label className="text-[10px] sm:text-[11px] uppercase tracking-[0.4em] text-slate-500 font-black ml-2">CREDENTIAL_EMAIL</label>
+              <div className="relative group/input">
+                <Mail className="absolute left-5 sm:left-6 top-1/2 -translate-y-1/2 w-5 h-5 sm:w-6 sm:h-6 text-slate-600 group-focus-within/input:text-neon-cyan transition-colors" />
                 <input 
                   type="email" 
                   required
-                  placeholder="name@example.com"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all font-medium"
+                  placeholder="AUTHOR_ID@PROTOCOL.X"
+                  className="w-full bg-black/40 border border-white/5 rounded-[20px] sm:rounded-[24px] py-4 sm:py-6 pl-12 sm:pl-16 pr-6 sm:pr-8 text-[11px] sm:text-[13px] focus:outline-none focus:ring-2 focus:ring-neon-cyan/20 focus:border-neon-cyan/40 transition-all font-black uppercase tracking-widest placeholder:text-slate-800"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-slate-500 font-bold ml-1">Password</label>
-              <div className="relative group">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+            <div className="space-y-3 sm:space-y-4">
+              <label className="text-[10px] sm:text-[11px] uppercase tracking-[0.4em] text-slate-500 font-black ml-2">ACCESS_PASSPHRASE</label>
+              <div className="relative group/input">
+                <Lock className="absolute left-5 sm:left-6 top-1/2 -translate-y-1/2 w-5 h-5 sm:w-6 sm:h-6 text-slate-600 group-focus-within/input:text-neon-cyan transition-colors" />
                 <input 
                   type="password" 
                   required
                   placeholder="••••••••"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all font-medium"
+                  className="w-full bg-black/40 border border-white/5 rounded-[20px] sm:rounded-[24px] py-4 sm:py-6 pl-12 sm:pl-16 pr-6 sm:pr-8 text-[11px] sm:text-[13px] focus:outline-none focus:ring-2 focus:ring-neon-cyan/20 focus:border-neon-cyan/40 transition-all font-black tracking-[0.5em] placeholder:text-slate-800"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -117,42 +118,43 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
 
             {error && (
               <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-5 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs text-center font-black uppercase tracking-widest leading-relaxed shadow-[0_0_20px_rgba(239,68,68,0.15)]"
               >
-                {error}
+                SECURITY_ERROR: {error}
               </motion.div>
             )}
 
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full bg-cyan-600 hover:bg-cyan-500 py-3.5 rounded-xl font-bold text-sm transition-all shadow-xl active:scale-[0.98] flex items-center justify-center gap-2 group border border-cyan-400/20"
+              className="w-full bg-white text-black hover:bg-slate-200 py-6 rounded-[28px] font-black text-[12px] uppercase tracking-[0.4em] transition-all shadow-[0_0_50px_rgba(255,255,255,0.15)] active:scale-[0.98] flex items-center justify-center gap-4 relative overflow-hidden group/btn"
             >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
               {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-6 h-6 animate-spin" />
               ) : (
                 <>
-                  {isLogin ? 'Sign In Intelligence' : 'Initialize Account'}
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <span>{isLogin ? 'BOOT_SYSTEM' : 'PROVISION_LINK'}</span>
+                  <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-2 transition-transform" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-white/5 text-center">
+          <div className="mt-12 pt-10 border-t border-white/5 text-center">
             <button 
               onClick={() => setIsLogin(!isLogin)}
-              className="text-xs text-slate-500 hover:text-cyan-400 transition-colors font-medium"
+              className="text-[11px] text-slate-500 hover:text-neon-cyan transition-all font-black uppercase tracking-[0.4em] hover:neon-text-cyan"
             >
-              {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+              {isLogin ? "PROTOCOL_BYPASS // NEW_LINK" : "RESTORE_LINK // SECURE_AUTH"}
             </button>
           </div>
           
-          <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-slate-600 uppercase tracking-widest font-bold">
-            <ShieldCheck className="w-3 h-3" />
-            SECURE ACCESS ENFORCED
+          <div className="mt-6 flex items-center justify-center gap-3 text-[11px] text-slate-700 uppercase tracking-[0.4em] font-black py-2 rounded-full border border-white/5 bg-white/2">
+            <ShieldCheck className="w-4 h-4" />
+            ENCRYPTED_OSINT_CHANNEL_ACTIVE
           </div>
         </div>
       </motion.div>
