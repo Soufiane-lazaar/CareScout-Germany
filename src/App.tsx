@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, MapPin, Building2, UserCircle, Mail, Phone, Info, Globe, ShieldCheck, Home, Bookmark, BookmarkCheck, ListChecks, X, LogOut, Users, Zap, Loader2 } from 'lucide-react';
-import { Institution, Contact, Lead, SearchHistory } from './types';
+import { Institution, Contact, Lead } from './types';
 import MapView from './components/MapView';
 import Auth from './components/Auth';
 import { supabase } from './lib/supabase';
@@ -11,7 +11,7 @@ import { History, Sparkles, BrainCircuit } from 'lucide-react';
 import { IntelReport } from './components/IntelReport';
 
 export default function App() {
-  type Tab = 'discovery' | 'leads' | 'history';
+  type Tab = 'discovery' | 'leads' | 'database';
   const [activeTab, setActiveTab] = useState<Tab>('discovery');
 
   const [session, setSession] = useState<User | null>(null);
@@ -21,7 +21,6 @@ export default function App() {
   const [selectedInst, setSelectedInst] = useState<Institution | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [savedLeads, setSavedLeads] = useState<Lead[]>([]);
-  const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
   const [hoveredInstId, setHoveredInstId] = useState<string | null>(null);
   const [isResearching, setIsResearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,54 +59,10 @@ export default function App() {
   useEffect(() => {
     if (session) {
       fetchLeads();
-      fetchHistory();
     } else {
       setSavedLeads([]);
-      setSearchHistory([]);
     }
   }, [session]);
-
-  const fetchHistory = async () => {
-    if (!session) return;
-    const { data, error } = await supabase
-      .from('search_history')
-      .select('*')
-      .eq('user_id', session.id)
-      .order('created_at', { ascending: false })
-      .limit(20);
-    
-    if (error) {
-      if (error.code === 'PGRST205') {
-        console.warn('Supabase table "search_history" is missing. Please run the setup SQL in supabase_setup.sql');
-        setDbMissing(true);
-      } else {
-        console.error('Error fetching history:', error);
-      }
-    } else {
-      setSearchHistory(data);
-    }
-  };
-
-  const saveSearchHistory = async (query: string, count: number) => {
-    if (!session || !query) return;
-    const { error } = await supabase
-      .from('search_history')
-      .insert({
-        user_id: session.id,
-        query: query,
-        results_count: count
-      });
-    
-    if (error) {
-      if (error.code === 'PGRST205') {
-        console.warn('Supabase table "search_history" is missing. Cannot save history.');
-      } else {
-        console.error('Error saving history:', error);
-      }
-    } else {
-      fetchHistory();
-    }
-  };
 
   const performDeepResearch = async () => {
     if (!selectedInst || isResearching) return;
@@ -279,7 +234,7 @@ export default function App() {
             </div>
           </div>
           
-          <div className="text-center space-y-6">
+          <div className="text-center space-y-4 sm:space-y-6">
             <motion.h1 
               initial={{ letterSpacing: '0.8em', opacity: 0 }}
               animate={{ letterSpacing: '0.2em', opacity: 1 }}
@@ -290,7 +245,7 @@ export default function App() {
             </motion.h1>
           </div>
 
-          <div className="mt-24 w-64 sm:w-80 flex flex-col items-center">
+          <div className="mt-16 sm:mt-24 w-56 sm:w-80 flex flex-col items-center">
              <div className="flex flex-col items-center gap-3 w-full">
                <div className="h-[2px] w-full bg-white/5 rounded-full overflow-hidden relative">
                  <motion.div 
@@ -440,9 +395,6 @@ export default function App() {
         });
       } else {
         setInstitutions(discovered);
-        if (searchQuery) {
-          saveSearchHistory(searchQuery, discovered.length);
-        }
       }
     } catch (err: any) {
       console.error("Discovery error:", err);
@@ -456,14 +408,14 @@ export default function App() {
     <div className="flex h-screen w-full overflow-hidden bg-[#020617] text-slate-200 relative">
       <div className="scanline" />
       {/* Mobile Top Bar */}
-      <header className="fixed top-0 left-0 right-0 h-24 apple-glass border-b border-white/5 flex items-center justify-between px-8 z-[100] sm:hidden">
-        <div className="flex items-center gap-5">
-          <div className="w-12 h-12 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(0,242,255,0.3)] neon-border">
+      <header className="fixed top-0 left-0 right-0 h-20 apple-glass border-b border-white/5 flex items-center justify-between px-6 z-[100] sm:hidden">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(0,242,255,0.3)] neon-border">
             <Globe className="text-white w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-[14px] font-black uppercase tracking-[0.4em] text-white italic">CARESCOUT</h1>
-            <p className="text-[8px] font-mono text-neon-cyan/80 uppercase tracking-widest mt-1">PROTOCOL_LINK_ESTABLISHED</p>
+            <h1 className="text-[14px] font-black uppercase tracking-[0.2em] text-white italic">CARESCOUT</h1>
+            <p className="text-[8px] font-mono text-neon-cyan/80 uppercase tracking-widest mt-0.5 font-bold">ESTABLISHED</p>
           </div>
         </div>
         <button 
@@ -476,12 +428,12 @@ export default function App() {
 
       {/* Desktop Sidebar Navigation */}
       <nav className="hidden sm:flex w-24 md:w-28 bg-black/80 backdrop-blur-[40px] border-r border-white/5 flex-col items-center py-10 pb-12 z-50">
-        <div className="w-14 h-14 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-[18px] flex items-center justify-center shadow-[0_0_40px_rgba(0,242,255,0.3)] mb-16 relative group cursor-pointer neon-border transition-transform active:scale-95">
+        <div className="w-14 h-14 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-[18px] flex items-center justify-center shadow-[0_0_40px_rgba(0,242,255,0.3)] mb-12 relative group cursor-pointer neon-border transition-all hover:scale-105 active:scale-95">
           <div className="absolute inset-0 bg-white/10 rounded-[18px] opacity-0 group-hover:opacity-100 transition-opacity" />
           <Globe className="text-white w-7 h-7 neon-text-cyan" />
         </div>
 
-        <div className="flex flex-col gap-8 flex-1 justify-center">
+        <div className="flex flex-col gap-8 mt-6">
           <NavIcon 
             icon={<Search className="w-5 h-5 md:w-6 md:h-6" />} 
             label="SCAN" 
@@ -489,41 +441,41 @@ export default function App() {
             onClick={() => setActiveTab('discovery')} 
           />
           <NavIcon 
+            icon={<Building2 className="w-5 h-5 md:w-6 md:h-6" />} 
+            label="REGISTRY" 
+            active={activeTab === 'database'} 
+            onClick={() => setActiveTab('database')} 
+          />
+          <NavIcon 
             icon={<BookmarkCheck className="w-5 h-5 md:w-6 md:h-6" />} 
-            label="INTEL" 
+            label="TARGETS" 
             active={activeTab === 'leads'} 
             onClick={() => setActiveTab('leads')} 
           />
-          <NavIcon 
-            icon={<History className="w-5 h-5 md:w-6 md:h-6" />} 
-            label="LOGS" 
-            active={activeTab === 'history'} 
-            onClick={() => setActiveTab('history')} 
-          />
         </div>
 
-        <div className="mt-auto flex flex-col items-center gap-8 pt-8 border-t border-white/5 w-16">
+        <div className="mt-auto flex flex-col items-center gap-6 pt-10 border-t border-white/5 w-20">
           <div className="group relative">
-            <div className="absolute -inset-3 bg-white/5 blur-xl opacity-0 group-hover:opacity-100 transition-opacity rounded-full" />
-            <div className="w-12 h-12 rounded-[16px] bg-white/5 border border-white/10 flex items-center justify-center text-[10px] font-black text-white hover:bg-white/10 transition-all cursor-pointer relative z-10 shadow-xl overflow-hidden uppercase tracking-tighter">
+            <div className="absolute -inset-4 bg-neon-cyan/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity rounded-full" />
+            <div className="w-12 h-12 rounded-[16px] bg-white/5 border border-white/10 flex items-center justify-center text-[10px] font-black text-white hover:bg-white/10 transition-all cursor-pointer relative z-10 shadow-2xl overflow-hidden uppercase tracking-widest">
               {session?.email?.substring(0, 1).toUpperCase()}
             </div>
           </div>
           <button 
             onClick={handleSignOut}
-            className="p-3 text-slate-500 hover:text-white apple-glass rounded-xl transition-all group active:scale-90"
+            className="p-3 text-slate-500 hover:text-red-400 apple-glass rounded-xl transition-all group active:scale-90 border border-transparent hover:border-red-500/10 shadow-none"
             title="Terminate Session"
           >
-            <LogOut className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+            <LogOut className="w-5 h-5 group-hover:rotate-12 transition-transform" />
           </button>
         </div>
       </nav>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 h-28 apple-glass border-t border-white/5 flex items-center justify-around z-[100] px-4 pb-4">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 h-20 apple-glass border-t border-white/5 flex items-center justify-around z-[100] px-2 pb-2">
         <MobileNavIcon 
           icon={<Search className="w-6 h-6" />} 
-          label="DISCOVER"
+          label="SCAN"
           active={activeTab === 'discovery'} 
           onClick={() => {
             setActiveTab('discovery');
@@ -531,45 +483,46 @@ export default function App() {
           }} 
         />
         <MobileNavIcon 
+          icon={<Building2 className="w-6 h-6" />} 
+          label="NODES"
+          active={activeTab === 'database'} 
+          onClick={() => {
+            setActiveTab('database');
+            setMobileDrawerOpen(false);
+          }} 
+        />
+        <MobileNavIcon 
           icon={<BookmarkCheck className="w-6 h-6" />} 
-          label="INTEL"
+          label="TARGETS"
           active={activeTab === 'leads'} 
           onClick={() => {
             setActiveTab('leads');
             setMobileDrawerOpen(false);
           }} 
         />
-        <MobileNavIcon 
-          icon={<History className="w-6 h-6" />} 
-          label="LOGS"
-          active={activeTab === 'history'} 
-          onClick={() => {
-            setActiveTab('history');
-            setMobileDrawerOpen(false);
-          }} 
-        />
         <button 
           onClick={handleSignOut}
-          className="flex flex-col items-center gap-2 px-4 py-2 text-slate-500 hover:text-red-400 active:scale-90 transition-all"
+          className="flex flex-col items-center gap-1.5 px-3 py-2 text-slate-500 hover:text-red-400 active:scale-90 transition-all"
         >
           <LogOut className="w-6 h-6" />
           <span className="text-[8px] font-black uppercase tracking-widest opacity-40">EXIT</span>
         </button>
       </nav>
 
+      {activeTab !== 'database' && (
       <div className={`
         fixed inset-0 z-[90] bg-black/40 backdrop-blur-[60px] transition-transform duration-700 ease-[cubic-bezier(0.16, 1, 0.3, 1)] sm:relative sm:inset-auto sm:translate-x-0
         w-full sm:w-96 md:w-[28rem] flex flex-col border-r border-white/5
         ${mobileDrawerOpen ? 'translate-x-0' : '-translate-x-full sm:translate-x-0'}
       `}>
-        <header className="p-10 pb-8 border-b border-white/5 bg-white/2 mt-24 sm:mt-0">
-          <div className="flex items-center justify-between mb-8">
-             <div className="flex items-center gap-4">
-               <div className="w-3 h-3 rounded-full bg-neon-cyan shadow-[0_0_15px_rgba(0,242,255,1)] animate-pulse" />
-               <h1 className="text-[12px] font-black uppercase tracking-[0.5em] text-white/40">CARESCOUT_CORE</h1>
-             </div>
+        <header className="p-8 pb-6 border-b border-white/5 bg-white/2 mt-20 sm:mt-0">
+          <div className="flex items-center justify-between mb-6">
              <div className="flex items-center gap-3">
-               <span className="text-[10px] font-mono text-neon-cyan/60">NODE_AUTH</span>
+               <div className="w-2.5 h-2.5 rounded-full bg-neon-cyan shadow-[0_0_10px_rgba(0,242,255,1)] animate-pulse" />
+               <h1 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">CARESCOUT_CORE</h1>
+             </div>
+             <div className="flex items-center gap-3 sm:hidden">
+               <button onClick={() => setMobileDrawerOpen(false)} className="text-white/40 text-[10px] font-black tracking-widest">[ CLOSE ]</button>
              </div>
           </div>
           
@@ -596,7 +549,7 @@ export default function App() {
           </div>
           
           <p className="text-[9px] uppercase tracking-[0.3em] text-slate-500 font-black mt-3">
-            {activeTab === 'discovery' ? 'Autonomous Node Discovery' : activeTab === 'leads' ? 'Regional Intelligence' : 'System Diagnostic Logs'}
+            {activeTab === 'discovery' ? 'Autonomous Node Discovery' : 'Regional Intelligence'}
           </p>
           
           <AnimatePresence>
@@ -705,73 +658,9 @@ export default function App() {
               </div>
           )}
 
-          <div className="space-y-4">
-             <button 
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center justify-between w-full text-[10px] uppercase tracking-widest text-slate-500 font-bold hover:text-cyan-400 transition-colors"
-            >
-              <span>Protocol Filters</span>
-              <div className={`transition-transform duration-300 ${showFilters ? 'rotate-180' : ''}`}>
-                <Search className="w-3 h-3" />
-              </div>
-            </button>
-            
-            <AnimatePresence>
-              {showFilters && (
-                <motion.div 
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="flex flex-col gap-3 py-2">
-                    <input 
-                      type="text" 
-                      placeholder="Context filter..."
-                      className="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-3 text-[11px] focus:outline-none focus:border-cyan-500/50"
-                      value={filterText}
-                      onChange={(e) => setFilterText(e.target.value)}
-                    />
-                    
-                    <div className="grid grid-cols-1 gap-2">
-                      <select 
-                        value={filterType}
-                        onChange={(e) => setFilterType(e.target.value)}
-                        className="bg-white/5 border border-white/10 rounded-lg py-1.5 px-2 text-[10px] appearance-none focus:outline-none"
-                      >
-                        <option value="all" className="bg-slate-900">All Types</option>
-                        <option value="hospital" className="bg-slate-900">Hospital</option>
-                        <option value="nursing_home" className="bg-slate-900">Nursing</option>
-                        <option value="academy" className="bg-slate-900">Academy</option>
-                      </select>
-                      
-                      <div className="flex gap-2">
-                        <button 
-                          onClick={() => setFilterVerified(!filterVerified)}
-                          className={`flex-1 py-1.5 rounded-lg border text-[10px] transition-all flex items-center justify-center gap-1.5 ${filterVerified ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-white/5 border-white/10 text-slate-400'}`}
-                        >
-                          <ShieldCheck className="w-3 h-3" />
-                          Verified
-                        </button>
-
-                        <button 
-                          onClick={() => setFilterContract(!filterContract)}
-                          className={`flex-1 py-1.5 rounded-lg border text-[10px] transition-all flex items-center justify-center gap-1.5 ${filterContract ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-white/5 border-white/10 text-slate-400'}`}
-                        >
-                          <Sparkles className="w-3 h-3" />
-                          Agreement
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
           <div className="space-y-3">
              <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold flex items-center justify-between border-b border-white/5 pb-2">
-              <span>{activeTab === 'discovery' ? 'Discovery Stream' : activeTab === 'leads' ? 'Target Matrix' : 'Audit Log'}</span>
+              <span>{activeTab === 'discovery' ? 'Discovery Stream' : 'Target Matrix'}</span>
               {activeTab === 'leads' && (
                 <button onClick={exportLeadsToCSV} className="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1">
                   <Globe className="w-2.5 h-2.5" /> <span>Export</span>
@@ -780,27 +669,6 @@ export default function App() {
             </div>
 
             <AnimatePresence mode="popLayout">
-              {activeTab === 'history' ? (
-                 <motion.div key="history-list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
-                  {searchHistory.map((h) => (
-                    <button
-                      key={h.id}
-                      onClick={() => {
-                        setSearchQuery(h.query);
-                        setTimeout(startDiscovery, 100);
-                        setActiveTab('discovery');
-                      }}
-                      className="w-full p-4 glass-card text-left hover:bg-white/10 flex items-center justify-between group rounded-xl border border-white/5"
-                    >
-                      <div>
-                        <p className="text-xs font-bold text-white">{h.query}</p>
-                        <p className="text-[10px] text-slate-500">{new Date(h.created_at).toLocaleString()}</p>
-                      </div>
-                      <span className="text-[10px] bg-cyan-500/5 text-cyan-400 px-2 py-0.5 rounded-full border border-cyan-500/20">{h.results_count} entities</span>
-                    </button>
-                  ))}
-                </motion.div>
-              ) : (
                 <motion.div key="list-items" className="space-y-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   {filteredDisplayList.map((inst, idx) => (
                     <motion.div
@@ -837,14 +705,14 @@ export default function App() {
                     </motion.div>
                   ))}
                 </motion.div>
-              )}
             </AnimatePresence>
           </div>
         </div>
       </div>
+      )}
 
       {/* Main Content (Map + Intelligence) */}
-      <main className="flex-1 relative bg-[#020617] overflow-hidden flex flex-col">
+      <main className="flex-1 relative bg-[#020617] overflow-hidden flex flex-col pt-20 pb-20 sm:pt-0 sm:pb-0">
         {/* HUD Overlay Top */}
         <div className="absolute top-6 left-6 right-6 flex items-center justify-between z-30 pointer-events-none">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -875,19 +743,79 @@ export default function App() {
         <div className="absolute bottom-6 right-6 w-16 h-16 border-r-2 border-b-2 border-white/10 pointer-events-none z-20 hidden lg:block" />
 
         <div className="flex-1 relative">
-          <MapView 
-            institutions={institutions} 
-            onSelect={(inst) => {
-              setSelectedInst(inst);
-              if (window.innerWidth < 1024) setMobileDrawerOpen(false);
-            }} 
-            hoveredId={hoveredInstId}
-            center={selectedInst ? [selectedInst.lon, selectedInst.lat] : institutions.length > 0 && !isScanning ? [institutions[0].lon, institutions[0].lat] : undefined}
-            onSearchInArea={(lat, lon, zoom) => {
-              const radius = Math.max(5000, Math.min(100000, (20 - zoom) * 5000));
-              startDiscovery({ lat, lon, radius });
-            }}
-          />
+          {activeTab === 'database' ? (
+            <div className="absolute inset-0 overflow-y-auto p-6 sm:p-12 pb-40">
+              <div className="max-w-7xl mx-auto">
+                {institutions.length === 0 ? (
+                  <div className="py-24 flex flex-col items-center justify-center apple-glass rounded-[32px] border-white/5 space-y-6 bg-white/[0.01]">
+                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center animate-pulse">
+                      <Search className="w-6 h-6 text-slate-700" />
+                    </div>
+                    <div className="text-center space-y-1">
+                       <p className="text-white font-black uppercase tracking-widest text-[10px]">No infrastructure detected.</p>
+                       <p className="text-slate-600 font-mono text-[8px] uppercase tracking-widest">Initialize scan protocol.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {institutions.map((inst, idx) => (
+                      <motion.div
+                        key={inst.id}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.04 }}
+                        onClick={() => setSelectedInst(inst)}
+                        className="apple-glass p-7 rounded-[24px] border-white/5 hover:bg-white/[0.04] transition-all group cursor-pointer border hover:border-white/20 relative overflow-hidden flex flex-col h-full shadow-2xl"
+                      >
+                         <div className="flex-1 space-y-5">
+                            <div className="flex items-center justify-between">
+                               <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center group-hover:bg-neon-cyan/20 transition-all duration-300">
+                                  <Globe className="w-6 h-6 text-slate-500 group-hover:text-neon-cyan transition-colors" />
+                               </div>
+                               <div className="flex items-center gap-2">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-neon-cyan shadow-[0_0_8px_rgba(0,242,255,0.8)]" />
+                                  <span className="text-[9px] font-black text-neon-cyan uppercase tracking-widest">LIVE</span>
+                               </div>
+                            </div>
+                            <div>
+                               <h3 className="text-lg font-black text-white uppercase italic tracking-tight group-hover:text-neon-cyan transition-colors line-clamp-2 leading-tight">{inst.name}</h3>
+                               <div className="flex items-center gap-2 mt-3 text-slate-500 font-black uppercase text-[9px] tracking-widest opacity-60 group-hover:opacity-100 transition-opacity">
+                                  <MapPin className="w-3.5 h-3.5 text-neon-cyan" />
+                                  <span className="truncate">{inst.city}</span>
+                               </div>
+                            </div>
+                         </div>
+                         
+                         <div className="mt-8 pt-5 border-t border-white/5 flex items-center justify-between">
+                            <div className="flex flex-col">
+                               <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest mb-0.5">INTEL_LEVEL</span>
+                               <span className="text-[11px] font-black text-white italic">{inst.intel?.score || 0}%</span>
+                            </div>
+                            <div className="px-4 py-2 bg-white/5 rounded-lg text-[9px] font-black text-slate-400 group-hover:text-white group-hover:bg-white/10 transition-all">
+                               ACCESS_NODE
+                            </div>
+                         </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <MapView 
+              institutions={institutions} 
+              onSelect={(inst) => {
+                setSelectedInst(inst);
+                if (window.innerWidth < 1024) setMobileDrawerOpen(false);
+              }} 
+              hoveredId={hoveredInstId}
+              center={selectedInst ? [selectedInst.lon, selectedInst.lat] : institutions.length > 0 && !isScanning ? [institutions[0].lon, institutions[0].lat] : undefined}
+              onSearchInArea={(lat, lon, zoom) => {
+                const radius = Math.max(5000, Math.min(100000, (20 - zoom) * 5000));
+                startDiscovery({ lat, lon, radius });
+              }}
+            />
+          )}
         </div>
 
         {/* Intelligence Overlay */}
@@ -898,33 +826,31 @@ export default function App() {
               animate={{ opacity: 1, x: 0, y: 0 }}
               exit={{ opacity: 0, x: window.innerWidth > 1024 ? 400 : 0, y: window.innerWidth > 1024 ? 0 : 200 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className={`
-                fixed z-50 overflow-y-auto transition-all shadow-[0_0_100px_rgba(0,0,0,0.8)]
-                ${window.innerWidth > 1024 
-                  ? 'top-4 right-4 bottom-4 w-[36rem] apple-glass rounded-[48px] neon-border p-12' 
-                  : 'inset-0 w-full h-full bg-black/95 backdrop-blur-3xl p-8'
-                }
-              `}
+              className="fixed z-50 overflow-y-auto transition-all shadow-[0_0_100px_rgba(0,0,0,0.8)] inset-0 w-full h-full bg-black/95 backdrop-blur-3xl p-6 sm:p-8 lg:inset-auto lg:top-4 lg:right-4 lg:bottom-4 lg:w-[36rem] lg:apple-glass lg:rounded-[48px] lg:neon-border lg:p-12 lg:bg-transparent"
             >
-              <div className="pb-32">
-                <div className="flex items-start justify-between mb-12">
-                  <div className="space-y-4">
-                    <div className="px-4 py-1.5 rounded-full bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan text-[10px] font-black uppercase tracking-[0.3em] inline-flex items-center gap-2">
+              <div className="pb-24 sm:pb-32">
+                <div className="flex items-start justify-between mb-8 sm:mb-12 mt-16 lg:mt-0">
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] inline-flex items-center gap-2">
                        <div className="w-1.5 h-1.5 rounded-full bg-neon-cyan animate-pulse" />
                        REAL_TIME_STREAM
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-black text-white leading-tight uppercase italic tracking-tighter">{selectedInst.name}</h2>
-                    <div className="flex items-center gap-3 text-slate-400 font-black uppercase text-[11px] tracking-widest">
-                      <MapPin className="w-5 h-5 text-neon-cyan shadow-[0_0_10px_rgba(0,242,255,0.5)]" />
-                      <span>{selectedInst.address}, {selectedInst.city}</span>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight uppercase italic tracking-tighter">{selectedInst.name}</h2>
+                    <div className="flex items-center gap-2 sm:gap-3 text-slate-400 font-black uppercase text-[9px] sm:text-[11px] tracking-widest">
+                      <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-neon-cyan shadow-[0_0_10px_rgba(0,242,255,0.5)]" />
+                      <span className="truncate">{selectedInst.address}, {selectedInst.city}</span>
                     </div>
                   </div>
-                  <button onClick={() => setSelectedInst(null)} className="p-4 apple-glass hover:bg-white/10 rounded-[20px] transition-all group active:scale-95">
-                    <X className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" />
+                  <button 
+                    onClick={() => setSelectedInst(null)} 
+                    className="p-3 sm:p-4 apple-glass hover:bg-white/10 rounded-xl sm:rounded-[24px] border border-white/10 transition-all group active:scale-95 flex items-center gap-3"
+                  >
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-white transition-colors hidden sm:block">CLOSE_NODE</span>
+                    <X className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400 group-hover:text-white transition-colors" />
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-6 mb-12">
+                <div className="grid grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-12">
                   <StatusStat icon={<ShieldCheck className="w-6 h-6" />} label="OSINT Score" value={`${selectedInst.intel?.score || 0}%`} color="cyan" />
                   <StatusStat icon={<Globe className="w-6 h-6" />} label="International" value={selectedInst.intel?.visaSupport ? 'High' : 'Unknown'} color="blue" />
                   <StatusStat icon={<Home className="w-6 h-6" />} label="Living Support" value={selectedInst.intel?.accommodation ? 'Available' : 'Assisted'} color="purple" />
@@ -1049,16 +975,18 @@ function NavIcon({ icon, label, active, onClick }: { icon: React.ReactNode, labe
   return (
     <button 
       onClick={onClick}
-      className={`flex flex-col items-center gap-3 group transition-all relative ${active ? 'text-white' : 'text-slate-600 hover:text-slate-300'}`}
+      className={`flex flex-col items-center gap-2 group transition-all relative w-full ${active ? 'text-white' : 'text-slate-500 hover:text-slate-200'}`}
     >
-      <div className={`p-4 rounded-[24px] transition-all duration-500 border ${active ? 'bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.2)]' : 'bg-transparent border-transparent hover:bg-white/5'}`}>
-        {icon}
+      <div className={`p-3.5 rounded-2xl transition-all duration-300 border ${active ? 'bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.2)]' : 'bg-transparent border-transparent hover:bg-white/5'}`}>
+        {React.cloneElement(icon as React.ReactElement<any>, { className: 'w-5 h-5' })}
       </div>
-      <span className={`text-[10px] font-black uppercase tracking-[0.4em] font-sans transition-opacity duration-500 ${active ? 'opacity-100' : 'opacity-30'}`}>{label}</span>
+      <span className={`text-[8px] font-black uppercase tracking-[0.2em] font-sans transition-all duration-300 ${active ? 'opacity-100' : 'opacity-0 group-hover:opacity-40 translate-y-1 group-hover:translate-y-0'}`}>{label}</span>
       {active && (
         <motion.div 
-          layoutId="active-nav-dot"
-          className="absolute -left-8 md:-left-10 w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_15px_white]"
+          layoutId="active-nav-bar"
+          className="absolute -left-1 h-8 w-1 bg-white rounded-r-full shadow-[0_0_15px_white]"
+          initial={{ opacity: 0, x: -5 }}
+          animate={{ opacity: 1, x: 0 }}
         />
       )}
     </button>
@@ -1069,12 +997,18 @@ function MobileNavIcon({ icon, active, onClick, label }: { icon: React.ReactNode
   return (
     <button 
       onClick={onClick}
-      className={`flex flex-col items-center gap-2 transition-all relative ${active ? 'text-white' : 'text-slate-500'}`}
+      className={`flex flex-col items-center gap-1.5 transition-all relative ${active ? 'text-white' : 'text-slate-500'}`}
     >
-      <div className={`p-4 rounded-2xl transition-all duration-500 ${active ? 'bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.3)] scale-110' : 'bg-transparent border-transparent'}`}>
+      <div className={`p-3 rounded-2xl transition-all duration-500 ${active ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)] scale-110' : 'bg-transparent border-transparent'}`}>
         {icon}
       </div>
-      <span className={`text-[9px] font-black uppercase tracking-[0.3em] font-sans transition-opacity duration-500 ${active ? 'opacity-100' : 'opacity-40'}`}>{label}</span>
+      <span className={`text-[9px] font-black uppercase tracking-[0.2em] font-sans transition-opacity duration-500 ${active ? 'opacity-100' : 'opacity-40'}`}>{label}</span>
+      {active && (
+        <motion.div 
+          layoutId="mobile-nav-dot"
+          className="absolute -bottom-2 w-1 h-1 bg-white rounded-full"
+        />
+      )}
     </button>
   );
 }
@@ -1088,10 +1022,10 @@ function StatusStat({ icon, label, value, color }: { icon: React.ReactNode, labe
   };
 
   return (
-    <div className={`p-6 rounded-[32px] apple-glass border flex flex-col items-center justify-center text-center transition-all duration-500 hover:scale-105 active:scale-95 cursor-default group ${colorMap[color]}`}>
-      <div className="mb-4 p-3 rounded-2xl bg-black/40 group-hover:bg-black/60 transition-colors">{icon}</div>
-      <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-60 mb-2 truncate w-full">{label}</p>
-      <div className="text-xl font-black tracking-tight uppercase italic">{value}</div>
+    <div className={`p-4 sm:p-6 rounded-[24px] sm:rounded-[32px] apple-glass border flex flex-col items-center justify-center text-center transition-all duration-500 hover:scale-105 active:scale-95 cursor-default group ${colorMap[color]}`}>
+      <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-black/40 group-hover:bg-black/60 transition-colors">{icon}</div>
+      <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-black opacity-60 mb-2 truncate w-full">{label}</p>
+      <div className="text-lg sm:text-xl font-black tracking-tight uppercase italic">{value}</div>
     </div>
   );
 }

@@ -72,44 +72,44 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
         transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-lg z-10"
       >
-        <div className="apple-glass p-8 sm:p-16 rounded-[32px] sm:rounded-[48px] neon-border relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50 shadow-[0_0_20px_rgba(0,242,255,1)]"></div>
+        <div className="apple-glass p-5 sm:p-16 rounded-[24px] sm:rounded-[48px] neon-border relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50 shadow-[0_0_200px_rgba(0,242,255,1)]"></div>
           
-          <div className="flex flex-col items-center mb-10 sm:mb-14 text-center">
-            <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-[22px] sm:rounded-[28px] flex items-center justify-center mb-6 sm:mb-8 shadow-[0_0_60px_rgba(0,242,255,0.4)] group-hover:scale-105 sm:group-hover:scale-110 transition-all duration-700 neon-border">
-              <Globe className="text-white w-7 h-7 sm:w-10 sm:h-10 neon-text-cyan shadow-[0_0_10px_rgba(0,242,255,1)]" />
+          <div className="flex flex-col items-center mb-6 sm:mb-14 text-center">
+            <div className="w-12 h-12 sm:w-24 sm:h-24 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-[16px] sm:rounded-[28px] flex items-center justify-center mb-4 sm:mb-8 shadow-[0_0_60px_rgba(0,242,255,0.4)] group-hover:scale-105 sm:group-hover:scale-110 transition-all duration-700 neon-border">
+              <Globe className="text-white w-5 h-5 sm:w-10 sm:h-10 neon-text-cyan" />
             </div>
-            <h1 className="text-4xl sm:text-6xl font-black tracking-tighter text-white uppercase italic leading-none">CareScout</h1>
-            <p className="text-neon-cyan text-[9px] sm:text-[11px] uppercase tracking-[0.4em] sm:tracking-[0.6em] font-black mt-4 sm:mt-6 opacity-60 neon-text-cyan">
-              {isLogin ? 'SYSTEM_INITIALIZATION_ALPHA' : 'NETWORK_PROVISIONING_SEQ'}
+            <h1 className="text-2xl sm:text-6xl font-black tracking-tighter text-white uppercase italic leading-none">CareScout</h1>
+            <p className="text-neon-cyan text-[7px] sm:text-[11px] uppercase tracking-[0.4em] sm:tracking-[0.6em] font-black mt-2 sm:mt-6 opacity-60 neon-text-cyan">
+              {isLogin ? 'AUTHENTICATION_REQUIRED' : 'CREATING_NEW_OPERATOR'}
             </p>
           </div>
 
-          <form onSubmit={handleAuth} className="space-y-6 sm:space-y-8">
-            <div className="space-y-3 sm:space-y-4">
-              <label className="text-[10px] sm:text-[11px] uppercase tracking-[0.4em] text-slate-500 font-black ml-2">CREDENTIAL_EMAIL</label>
+          <form onSubmit={handleAuth} className="space-y-5 sm:space-y-8">
+            <div className="space-y-2 sm:space-y-4">
+              <label className="text-[9px] sm:text-[11px] uppercase tracking-[0.4em] text-slate-500 font-black ml-2">CREDENTIAL_EMAIL</label>
               <div className="relative group/input">
-                <Mail className="absolute left-5 sm:left-6 top-1/2 -translate-y-1/2 w-5 h-5 sm:w-6 sm:h-6 text-slate-600 group-focus-within/input:text-neon-cyan transition-colors" />
+                <Mail className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-6 sm:h-6 text-slate-600 group-focus-within/input:text-neon-cyan transition-colors" />
                 <input 
                   type="email" 
                   required
                   placeholder="AUTHOR_ID@PROTOCOL.X"
-                  className="w-full bg-black/40 border border-white/5 rounded-[20px] sm:rounded-[24px] py-4 sm:py-6 pl-12 sm:pl-16 pr-6 sm:pr-8 text-[11px] sm:text-[13px] focus:outline-none focus:ring-2 focus:ring-neon-cyan/20 focus:border-neon-cyan/40 transition-all font-black uppercase tracking-widest placeholder:text-slate-800"
+                  className="w-full bg-black/40 border border-white/5 rounded-[16px] sm:rounded-[24px] py-4 sm:py-6 pl-10 sm:pl-16 pr-5 sm:pr-8 text-[11px] sm:text-[13px] focus:outline-none focus:ring-2 focus:ring-neon-cyan/20 focus:border-neon-cyan/40 transition-all font-black uppercase tracking-widest placeholder:text-slate-800"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
             </div>
 
-            <div className="space-y-3 sm:space-y-4">
-              <label className="text-[10px] sm:text-[11px] uppercase tracking-[0.4em] text-slate-500 font-black ml-2">ACCESS_PASSPHRASE</label>
+            <div className="space-y-2 sm:space-y-4">
+              <label className="text-[9px] sm:text-[11px] uppercase tracking-[0.4em] text-slate-500 font-black ml-2">ACCESS_PASSPHRASE</label>
               <div className="relative group/input">
-                <Lock className="absolute left-5 sm:left-6 top-1/2 -translate-y-1/2 w-5 h-5 sm:w-6 sm:h-6 text-slate-600 group-focus-within/input:text-neon-cyan transition-colors" />
+                <Lock className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-6 sm:h-6 text-slate-600 group-focus-within/input:text-neon-cyan transition-colors" />
                 <input 
                   type="password" 
                   required
                   placeholder="••••••••"
-                  className="w-full bg-black/40 border border-white/5 rounded-[20px] sm:rounded-[24px] py-4 sm:py-6 pl-12 sm:pl-16 pr-6 sm:pr-8 text-[11px] sm:text-[13px] focus:outline-none focus:ring-2 focus:ring-neon-cyan/20 focus:border-neon-cyan/40 transition-all font-black tracking-[0.5em] placeholder:text-slate-800"
+                  className="w-full bg-black/40 border border-white/5 rounded-[16px] sm:rounded-[24px] py-4 sm:py-6 pl-10 sm:pl-16 pr-5 sm:pr-8 text-[11px] sm:text-[13px] focus:outline-none focus:ring-2 focus:ring-neon-cyan/20 focus:border-neon-cyan/40 transition-all font-black tracking-[0.5em] placeholder:text-slate-800"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
